@@ -6,14 +6,19 @@ public class SpawnerManager : MonoBehaviour
 {
     [SerializeField]
     private GameObject _enemyPrefab;
-
+    [SerializeField]
+    private GameObject _powerUpPrefab;
     [SerializeField]
     private GameObject _enemyContainer;
+    [SerializeField]
+    private GameObject _powerUpContainer;
+    
 
     private bool _stopSpawner = false;
     void Start()
     {
-        StartCoroutine(Spawner());
+        StartCoroutine(EnemySpawner());
+        StartCoroutine(PowerUpSpawner());
     }
 
     void Update()
@@ -21,7 +26,7 @@ public class SpawnerManager : MonoBehaviour
         
     }
 
-    IEnumerator Spawner()
+    IEnumerator EnemySpawner()
     {
 
         while (_stopSpawner == false)
@@ -33,6 +38,19 @@ public class SpawnerManager : MonoBehaviour
             yield return new WaitForSeconds(3);
         }
         
+    }
+    IEnumerator PowerUpSpawner()
+    {
+
+        while (_stopSpawner == false)
+        {
+            Vector3 powerUpOffSet = new(Random.Range(-6.0f, 6.0f), 5, 0);
+
+            GameObject newPowerUP = Instantiate(_powerUpPrefab, powerUpOffSet, Quaternion.identity);
+            newPowerUP.transform.SetParent(_powerUpContainer.transform);
+            yield return new WaitForSeconds(10);
+        }
+
     }
 
     public void OnPlayerDead()
