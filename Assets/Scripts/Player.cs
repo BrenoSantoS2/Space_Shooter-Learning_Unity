@@ -7,22 +7,29 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField]
+    private float _speed = 5.0f;
     private float _fireRate = 0.5f;
     private float _nextTime = 0f;
+
     [SerializeField]
     private int _lives = 3;
 
     // Intantiate
+    private SpawnerManager _spawnerManager;
+
     [SerializeField]
     private GameObject _lazerPrefab;
-    private SpawnerManager _spawnerManager;
+
     [SerializeField]
     private GameObject _tripleShotPrefab;
 
     //Power Ups
     private float _powerUpDuration = 5f;
-    private bool _tripleShot = false;
+    private bool _isTripleShotActive = false;
+    private bool _isShieldActive = false;
+
+    [SerializeField]
+    private GameObject _shieldVisualization;
 
 
 
@@ -30,9 +37,9 @@ public class Player : MonoBehaviour
     {
         _spawnerManager = GameObject.Find("Spawner_Manager").GetComponent<SpawnerManager>();
         transform.position = new Vector3(0, 0, 0);
+        _shieldVisualization.SetActive(false);
     }
         
-    // Update is called once per frame 
     void Update()
     {
         Move();
@@ -46,13 +53,12 @@ public class Player : MonoBehaviour
 
     void Move()
     {
-        float speed = 5.0f;
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
         Vector3 direction = new(horizontalInput, verticalInput, 0);
 
-        transform.Translate(speed * Time.deltaTime * direction);
+        transform.Translate(_speed * Time.deltaTime * direction);
     }
 
     void InvisibleWall()
@@ -69,7 +75,7 @@ public class Player : MonoBehaviour
     {
         _nextTime = Time.time + _fireRate;
 
-        if (_tripleShot == true)
+        if (_isTripleShotActive == true)
         {
             Vector3 lazerOffSet = new(transform.position.x -0.5f, transform.position.y, 0);
             Instantiate(_tripleShotPrefab, lazerOffSet, Quaternion.identity);
@@ -80,15 +86,17 @@ public class Player : MonoBehaviour
             Vector3 lazerOffSet = new(transform.position.x, transform.position.y + 1.05f, 0);
             Instantiate(_lazerPrefab, lazerOffSet, Quaternion.identity);
         }
-
-
-
-
-
     }
 
     public void TakeDamage()
-    {
+    {   
+        if (_isShieldActive == true)
+        {
+            _isShieldActive = false;
+            _shieldVisualization.SetActive(false);
+            return;
+        }
+
         _lives--;
 
         if (_lives <= 0)
@@ -98,18 +106,33 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void PowerUp()
+    public void TripleShot()
     {
         StartCoroutine(ActiveTripleShot());
+    }
+    public void SpeedBoost()
+    {
+        StartCoroutine(ActiveSpeedBoost());
+    }
+    public void Shield()
+    {
+        _isShieldActive = true;
+        _shieldVisualization.SetActive(true);
+
     }
 
     IEnumerator ActiveTripleShot()
     {
-        _tripleShot = true;
-        yield return new WaitForSeconds(_powerUpDuration); 
-        _tripleShot = false;
-   
+        _isTripleShotActive = true;
+        yield return new WaitForSeconds(_powerUpDuration);
+        _isTripleShotActive = false;
     }
 
+    IEnumerator ActiveSpeedBoost()
+    {
+        _speed = 10f;
+        yield return new WaitForSeconds(_powerUpDuration);
+        _speed = 5f;
+    }
 }
     

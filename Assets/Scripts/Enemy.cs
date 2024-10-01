@@ -20,7 +20,7 @@ public class Enemy : MonoBehaviour
     {
         float spawnRange = Random.Range(-6.0f, 6.0f);
 
-        transform.Translate(Vector3.down * _speed * Time.deltaTime);
+        transform.Translate(_speed * Time.deltaTime * Vector3.down);
 
         if(transform.position.y <= -5.5f)
         {
