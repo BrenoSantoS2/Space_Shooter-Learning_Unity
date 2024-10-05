@@ -5,10 +5,6 @@ using UnityEngine;
 public class Lazer : MonoBehaviour
 {
     private float _speed = 5.0f;
-    void Start()
-    {
-        
-    }
 
     void Update()
     {

@@ -31,6 +31,8 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _shieldVisualization;
 
+    private int _score = 0;
+
 
 
     void Start()
@@ -38,8 +40,7 @@ public class Player : MonoBehaviour
         _spawnerManager = GameObject.Find("Spawner_Manager").GetComponent<SpawnerManager>();
         transform.position = new Vector3(0, 0, 0);
         _shieldVisualization.SetActive(false);
-    }
-        
+    }  
     void Update()
     {
         Move();
@@ -50,7 +51,6 @@ public class Player : MonoBehaviour
             ShootLazer();
         }
     }
-
     void Move()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
@@ -60,7 +60,6 @@ public class Player : MonoBehaviour
 
         transform.Translate(_speed * Time.deltaTime * direction);
     }
-
     void InvisibleWall()
     {
         float playerY = transform.position.y;
@@ -70,7 +69,6 @@ public class Player : MonoBehaviour
 
         transform.position = new Vector3(Mathf.Clamp(playerX, -horizontalLimit, horizontalLimit), Mathf.Clamp(playerY, -verticalLimit, verticalLimit), 0);
     }
-
     void ShootLazer()
     {
         _nextTime = Time.time + _fireRate;
@@ -87,7 +85,6 @@ public class Player : MonoBehaviour
             Instantiate(_lazerPrefab, lazerOffSet, Quaternion.identity);
         }
     }
-
     public void TakeDamage()
     {   
         if (_isShieldActive == true)
@@ -105,14 +102,25 @@ public class Player : MonoBehaviour
             _spawnerManager.OnPlayerDead();
         }
     }
-
     public void TripleShot()
     {
         StartCoroutine(ActiveTripleShot());
     }
+    IEnumerator ActiveTripleShot()
+    {
+        _isTripleShotActive = true;
+        yield return new WaitForSeconds(_powerUpDuration);
+        _isTripleShotActive = false;
+    }
     public void SpeedBoost()
     {
         StartCoroutine(ActiveSpeedBoost());
+    }
+    IEnumerator ActiveSpeedBoost()
+    {
+        _speed = 10f;
+        yield return new WaitForSeconds(_powerUpDuration);
+        _speed = 5f;
     }
     public void Shield()
     {
@@ -120,19 +128,13 @@ public class Player : MonoBehaviour
         _shieldVisualization.SetActive(true);
 
     }
-
-    IEnumerator ActiveTripleShot()
+    public void AddScore(int points)
     {
-        _isTripleShotActive = true;
-        yield return new WaitForSeconds(_powerUpDuration);
-        _isTripleShotActive = false;
+        _score += points;
     }
-
-    IEnumerator ActiveSpeedBoost()
+    public int GetScore()
     {
-        _speed = 10f;
-        yield return new WaitForSeconds(_powerUpDuration);
-        _speed = 5f;
+        return _score;
     }
 }
     
