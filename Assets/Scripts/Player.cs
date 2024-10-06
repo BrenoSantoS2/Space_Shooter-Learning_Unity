@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine.SceneManagement;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
 
     // Intantiate
     private SpawnerManager _spawnerManager;
+    private UIManeger _uiManeger;
 
     [SerializeField]
     private GameObject _lazerPrefab;
@@ -33,13 +35,25 @@ public class Player : MonoBehaviour
 
     private int _score = 0;
 
-
-
     void Start()
     {
         _spawnerManager = GameObject.Find("Spawner_Manager").GetComponent<SpawnerManager>();
+        _uiManeger = GameObject.Find("Canvas").GetComponent<UIManeger>();
+
+        if (_spawnerManager == null)
+        {
+            Debug.LogError("The Spawn Manager is Null");
+        }
+
+        if (_uiManeger == null)
+        {
+            Debug.LogError("The UI Manager is Null");
+        }
+
         transform.position = new Vector3(0, 0, 0);
         _shieldVisualization.SetActive(false);
+
+
     }  
     void Update()
     {
@@ -95,6 +109,7 @@ public class Player : MonoBehaviour
         }
 
         _lives--;
+        _uiManeger.UpdateLives(_lives);
 
         if (_lives <= 0)
         {
@@ -131,10 +146,7 @@ public class Player : MonoBehaviour
     public void AddScore(int points)
     {
         _score += points;
-    }
-    public int GetScore()
-    {
-        return _score;
+        _uiManeger.UpdateScore (_score);
     }
 }
     
